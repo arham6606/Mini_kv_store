@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/app.dir/src/kv_store.cpp.o CMakeFiles/app.dir/tests/test_kv_store.cpp.o -o app 

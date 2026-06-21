@@ -1,0 +1,36 @@
+#pragma once
+#include <iostream>
+#include <cstddef>
+#include <optional>
+#include <string>
+#include <unordered_map>
+
+namespace kvstore {
+class KVStore {
+public:
+    KVStore()
+    {
+        store_.reserve(10000);
+        store_.max_load_factor(0.3);
+    }
+
+    void set(const std::string& key, const std::string& value);
+
+    // nodiscard just tells the caller that they should check the return value, and store it that return value in a variable. If the caller ignores the return value, the compiler will emit a warning.
+
+    // Optional tells about the return value of the function. It can either contain a string (the value associated with the key) or it can be empty (if the key is not present in the store). This way, we can distinguish between a key that is present with an empty string as its value, and a key that is not present at all.
+      
+    [[nodiscard]] std::optional<std::string> get(const std::string& key) const;
+
+    bool del(const std::string& key);
+
+    [[nodiscard]] bool exists(const std::string& key) const;
+
+    // noexcept tells the compiler that this function will not throw any exceptions.
+
+    [[nodiscard]] std::size_t size() const noexcept;
+
+private:
+    std::unordered_map<std::string, std::string> store_;
+};
+}  // namespace kvstore
