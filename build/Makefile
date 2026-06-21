@@ -153,29 +153,29 @@ src/kv_store.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/kv_store.cpp.s
 .PHONY : src/kv_store.cpp.s
 
-tests/test_kv_store.o: tests/test_kv_store.cpp.o
-.PHONY : tests/test_kv_store.o
+src/main.o: src/main.cpp.o
+.PHONY : src/main.o
 
 # target to build an object file
-tests/test_kv_store.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/tests/test_kv_store.cpp.o
-.PHONY : tests/test_kv_store.cpp.o
+src/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/main.cpp.o
+.PHONY : src/main.cpp.o
 
-tests/test_kv_store.i: tests/test_kv_store.cpp.i
-.PHONY : tests/test_kv_store.i
+src/main.i: src/main.cpp.i
+.PHONY : src/main.i
 
 # target to preprocess a source file
-tests/test_kv_store.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/tests/test_kv_store.cpp.i
-.PHONY : tests/test_kv_store.cpp.i
+src/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
 
-tests/test_kv_store.s: tests/test_kv_store.cpp.s
-.PHONY : tests/test_kv_store.s
+src/main.s: src/main.cpp.s
+.PHONY : src/main.s
 
 # target to generate assembly for a file
-tests/test_kv_store.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/tests/test_kv_store.cpp.s
-.PHONY : tests/test_kv_store.cpp.s
+src/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
 
 # Help Target
 help:
@@ -189,9 +189,9 @@ help:
 	@echo "... src/kv_store.o"
 	@echo "... src/kv_store.i"
 	@echo "... src/kv_store.s"
-	@echo "... tests/test_kv_store.o"
-	@echo "... tests/test_kv_store.i"
-	@echo "... tests/test_kv_store.s"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
 .PHONY : help
 
 

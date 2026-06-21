@@ -113,7 +113,14 @@ int main() {
             }
             std::cout << "(" << (store.exists(key) ? 1 : 0) << ")\n";
 
-        } else {
+        }
+        
+        else if(cmd == "PING")
+        {
+            std::cout << "PONG\n";
+        }
+        
+        else {
             std::cout << "(error) unknown command '" << cmd << "'. Type HELP.\n";
         }
     }

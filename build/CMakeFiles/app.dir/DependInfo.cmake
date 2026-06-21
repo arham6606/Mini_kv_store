@@ -9,7 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/src/kv_store.cpp" "CMakeFiles/app.dir/src/kv_store.cpp.o" "gcc" "CMakeFiles/app.dir/src/kv_store.cpp.o.d"
-  "/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/tests/test_kv_store.cpp" "CMakeFiles/app.dir/tests/test_kv_store.cpp.o" "gcc" "CMakeFiles/app.dir/tests/test_kv_store.cpp.o.d"
+  "/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/src/main.cpp" "CMakeFiles/app.dir/src/main.cpp.o" "gcc" "CMakeFiles/app.dir/src/main.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.
