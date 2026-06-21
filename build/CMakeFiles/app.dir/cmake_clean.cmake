@@ -3,6 +3,10 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/src/kv_store.cpp.o.d"
   "CMakeFiles/app.dir/src/main.cpp.o"
   "CMakeFiles/app.dir/src/main.cpp.o.d"
+  "CMakeFiles/app.dir/src/network/server.cpp.o"
+  "CMakeFiles/app.dir/src/network/server.cpp.o.d"
+  "CMakeFiles/app.dir/src/network/socket_utils.cpp.o"
+  "CMakeFiles/app.dir/src/network/socket_utils.cpp.o.d"
   "app"
   "app.pdb"
 )

@@ -10,6 +10,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/src/kv_store.cpp" "CMakeFiles/app.dir/src/kv_store.cpp.o" "gcc" "CMakeFiles/app.dir/src/kv_store.cpp.o.d"
   "/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/src/main.cpp" "CMakeFiles/app.dir/src/main.cpp.o" "gcc" "CMakeFiles/app.dir/src/main.cpp.o.d"
+  "/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/src/network/server.cpp" "CMakeFiles/app.dir/src/network/server.cpp.o" "gcc" "CMakeFiles/app.dir/src/network/server.cpp.o.d"
+  "/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/src/network/socket_utils.cpp" "CMakeFiles/app.dir/src/network/socket_utils.cpp.o" "gcc" "CMakeFiles/app.dir/src/network/socket_utils.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

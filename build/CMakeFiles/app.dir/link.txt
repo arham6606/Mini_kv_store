@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/app.dir/src/main.cpp.o CMakeFiles/app.dir/src/kv_store.cpp.o -o app 
+/usr/bin/c++ CMakeFiles/app.dir/src/main.cpp.o CMakeFiles/app.dir/src/kv_store.cpp.o CMakeFiles/app.dir/src/network/server.cpp.o CMakeFiles/app.dir/src/network/socket_utils.cpp.o -o app 

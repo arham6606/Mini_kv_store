@@ -177,6 +177,54 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/network/server.o: src/network/server.cpp.o
+.PHONY : src/network/server.o
+
+# target to build an object file
+src/network/server.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/network/server.cpp.o
+.PHONY : src/network/server.cpp.o
+
+src/network/server.i: src/network/server.cpp.i
+.PHONY : src/network/server.i
+
+# target to preprocess a source file
+src/network/server.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/network/server.cpp.i
+.PHONY : src/network/server.cpp.i
+
+src/network/server.s: src/network/server.cpp.s
+.PHONY : src/network/server.s
+
+# target to generate assembly for a file
+src/network/server.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/network/server.cpp.s
+.PHONY : src/network/server.cpp.s
+
+src/network/socket_utils.o: src/network/socket_utils.cpp.o
+.PHONY : src/network/socket_utils.o
+
+# target to build an object file
+src/network/socket_utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/network/socket_utils.cpp.o
+.PHONY : src/network/socket_utils.cpp.o
+
+src/network/socket_utils.i: src/network/socket_utils.cpp.i
+.PHONY : src/network/socket_utils.i
+
+# target to preprocess a source file
+src/network/socket_utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/network/socket_utils.cpp.i
+.PHONY : src/network/socket_utils.cpp.i
+
+src/network/socket_utils.s: src/network/socket_utils.cpp.s
+.PHONY : src/network/socket_utils.s
+
+# target to generate assembly for a file
+src/network/socket_utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/app.dir/build.make CMakeFiles/app.dir/src/network/socket_utils.cpp.s
+.PHONY : src/network/socket_utils.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -192,6 +240,12 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/network/server.o"
+	@echo "... src/network/server.i"
+	@echo "... src/network/server.s"
+	@echo "... src/network/socket_utils.o"
+	@echo "... src/network/socket_utils.i"
+	@echo "... src/network/socket_utils.s"
 .PHONY : help
 
 

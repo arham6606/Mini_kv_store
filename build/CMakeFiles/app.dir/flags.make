@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/inc -I/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/src
+CXX_INCLUDES = -I/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store
 
 CXX_FLAGS = -std=gnu++17
 

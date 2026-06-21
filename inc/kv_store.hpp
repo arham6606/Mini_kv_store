@@ -4,7 +4,9 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
-
+#include <cctype>
+#include <sstream>
+#include <cstdlib>
 namespace kvstore {
 class KVStore {
 public:
