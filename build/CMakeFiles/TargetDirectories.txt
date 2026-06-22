@@ -1,3 +1,0 @@
-/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/build/CMakeFiles/app.dir
-/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/build/CMakeFiles/edit_cache.dir
-/home/arham/Documents/c++_infrastruture_backend/phase_2/projects/Mini_kv_store/build/CMakeFiles/rebuild_cache.dir
