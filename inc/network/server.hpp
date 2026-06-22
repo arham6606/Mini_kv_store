@@ -1,75 +1,84 @@
 #pragma once
 
+#include "inc/kv_store.hpp"
 
+#include <arpa/inet.h>
+#include <atomic>
+#include <cctype>
+#include <cerrno>
+#include <csignal>
 #include <cstring>
+#include <fcntl.h>
+#include <functional>
 #include <iostream>
 #include <memory>
-#include <functional>
-#include "inc/kv_store.hpp"
-#include <sys/socket.h>
 #include <netinet/in.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
 #include <sstream>
-#include <cctype>
-#include <cstring>
+#include <sys/socket.h>
+#include <thread>
+#include <unistd.h>
+#include <vector>
+
 namespace network {
 
 class Server {
 public:
-    Server(kvstore::KVStore& store, const std::string& host = "127.0.0.1", int port = 6379);
-    ~Server();
+  Server(kvstore::KVStore &store, const std::string &host = "127.0.0.1",
+         int port = 6379);
+  ~Server();
 
-    // Non-copyable
-    Server(const Server&) = delete;
-    Server& operator=(const Server&) = delete;
+  // Non-copyable
+  Server(const Server &) = delete;
+  Server &operator=(const Server &) = delete;
 
-    // Start the server (blocks until shutdown)
-    void start();
+  // Start the server (blocks until shutdown)
+  void start();
 
-    // Stop the server
-    void stop();
+  // Stop the server
+  void stop();
 
 private:
-    // Socket operations
-    int create_server_socket();
-    bool bind_socket(int sockfd);
-    bool listen_socket(int sockfd);
-    int accept_client(int sockfd);
-    
-    // Client handling
-    void handle_client(int client_fd);
-    std::string read_command(int client_fd);
-    void send_response(int client_fd, const std::string& response);
-    
-    // Command processing
-    std::string process_command(const std::string& cmd);
+  // Socket operations
+  int create_server_socket();
+  bool bind_socket(int sockfd);
+  bool listen_socket(int sockfd);
+  int accept_client(int sockfd);
 
-    kvstore::KVStore& store_;
-    std::string host_;
-    int port_;
-    int server_fd_;
-    bool running_;
+  // Client handling
+  void handle_client(int client_fd);
+  std::string read_command(int client_fd);
+  void send_response(int client_fd, const std::string &response);
+
+  // Command processing
+  std::string process_command(const std::string &cmd);
+
+  kvstore::KVStore &store_;
+  std::string host_;
+  int port_;
+  int server_fd_;
+  bool running_;
+  std::vector<int> client_fds;
+  std::vector<std::thread> client_threads_;
+  std::atomic<int> active_clients_{0};
 };
 
 namespace socket_utils {
-  
+
 int create_tcp_socket();
 
-bool bind_to_port(int sockfd, const std::string& host, int port);
+bool bind_to_port(int sockfd, const std::string &host, int port);
 
 bool set_listen(int sockfd, int backlog = 5);
 
 int accept_connection(int sockfd);
 
-ssize_t recv_data(int sockfd, char* buffer, size_t len);
+ssize_t recv_data(int sockfd, char *buffer, size_t len);
 
-bool send_data(int sockfd, const std::string& data);
+bool send_data(int sockfd, const std::string &data);
 
-void close_socket(int& sockfd);
+void close_socket(int &sockfd);
 
-std::string addr_to_string(const struct sockaddr_in& addr);
+std::string addr_to_string(const struct sockaddr_in &addr);
 
 } // namespace socket_utils
 
