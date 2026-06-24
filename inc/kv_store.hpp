@@ -42,7 +42,7 @@ public:
   [[nodiscard]] std::size_t size() const noexcept;
 
 private:
-  mutable std::mutex mutex_;
+  mutable std::shared_mutex mutex_;
   std::unordered_map<std::string, std::string> store_;
 };
 } // namespace kvstore
