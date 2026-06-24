@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SOURCES
     src/main.cpp
     src/kv_store.cpp
+    #tests/server_testing.cpp
+    #tests/kv_store_testing.cpp
     src/network/server.cpp
     src/network/socket_utils.cpp
 )
