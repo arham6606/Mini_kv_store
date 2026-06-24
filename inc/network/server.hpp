@@ -1,6 +1,7 @@
 #pragma once
 
 #include "inc/kv_store.hpp"
+#include "inc/network/thread_pool.hpp"
 
 #include <arpa/inet.h>
 #include <atomic>
@@ -19,13 +20,12 @@
 #include <unistd.h>
 #include <vector>
 
-
 namespace network {
-
 class Server {
 public:
   Server(kvstore::KVStore &store, const std::string &host = "127.0.0.1",
-         int port = 6379);
+         int port = 6379, size_t pool_size = 4);
+
   ~Server();
 
   // Non-copyable
@@ -55,12 +55,15 @@ private:
 
   int port_;
   int server_fd_;
-  bool running_;
+  std::atomic<bool> running_{false};
   kvstore::KVStore &store_;
   std::string host_;
-  std::vector<int> client_fds;
-  std::atomic<int> active_clients_{0};
-  std::vector<std::thread> client_threads_;
+  std::vector<int> client_fds_;
+  std::mutex client_fds_mutex_;
+  std::mutex shutdown_mutex_;
+  std::condition_variable shutdown_cv_;
+  std::thread accept_thread_;
+  ThreadPool pool;
 };
 
 namespace socket_utils {

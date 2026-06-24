@@ -10,6 +10,7 @@ set(SOURCES
     src/kv_store.cpp
     #tests/server_testing.cpp
     #tests/kv_store_testing.cpp
+    src/network/thread_pool.cpp
     src/network/server.cpp
     src/network/socket_utils.cpp
 )

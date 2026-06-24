@@ -2,6 +2,13 @@
 #include "inc/network/server.hpp"
 
 int main(int argc, char *argv[]) {
+
+  sigset_t mask;
+  sigemptyset(&mask);
+  sigaddset(&mask, SIGINT);
+  sigaddset(&mask, SIGTERM);
+  pthread_sigmask(SIG_BLOCK, &mask, nullptr);
+
   kvstore::KVStore store;
   std::string host = "127.0.0.1";
   int port = 6379;
@@ -25,8 +32,16 @@ int main(int argc, char *argv[]) {
   std::cout << "Starting kvstore server...\n";
   std::cout << "Host: " << host << ", Port: " << port << "\n";
 
-  network::Server server(store, host, port);
-  server.start();
+  size_t pool_size = 4;
+  network::Server server(store, host, port, pool_size);
 
+  // Wait for signals directly in main thread
+  server.start();
+  int sig;
+  sigwait(&mask, &sig); // ← Main thread blocks here
+  std::cout << "\nSignal " << sig << " received, shutting down...\n";
+
+  // server.wait_for_shutdown();
+  server.stop();
   return 0;
 }

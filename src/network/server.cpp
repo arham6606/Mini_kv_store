@@ -2,12 +2,6 @@
 
 #include "inc/network/server.hpp"
 
-namespace {
-volatile std::sig_atomic_t stop_signal_received = 0;
-
-void signal_handler(int signum) { stop_signal_received = signum; }
-} // namespace
-
 namespace network {
 
 namespace {
@@ -19,11 +13,16 @@ std::string to_upper(std::string s) {
 }
 } // namespace
 
-Server::Server(kvstore::KVStore &store, const std::string &host, int port)
-    : store_(store), host_(host), port_(port), server_fd_(-1), running_(false) {
-}
+Server::Server(kvstore::KVStore &store, const std::string &host, int port,
+               size_t pool_size)
+    : store_(store), host_(host), port_(port), pool(pool_size), server_fd_(-1),
+      running_(false) {}
 
-Server::~Server() { stop(); }
+Server::~Server() {
+  if (running_) {
+    stop();
+  }
+}
 
 int Server::create_server_socket() { return socket_utils::create_tcp_socket(); }
 
@@ -59,78 +58,63 @@ void Server::start() {
   std::cout << "Server listening on " << host_ << ":" << port_ << "\n";
   std::cout << "Press Ctrl+C to shutdown gracefully\n\n";
 
-  running_ = true;
-
-  struct sigaction sa;
-  sa.sa_handler = signal_handler;
-  sa.sa_flags = 0;
-
-  sigemptyset(&sa.sa_mask);
-
-  sigaction(SIGINT, &sa, NULL);
-  sigaction(SIGTERM, &sa, NULL);
-
-  int client_fd;
-
-  while (running_) {
-
-    if (stop_signal_received != 0) {
-      std::cout << "\n Signal " << stop_signal_received
-                << " received, shutting down...\n";
-      running_ = false;
-      break;
-    }
-
-    client_fd = accept_client(server_fd_);
-
-    if (client_fd < 0) {
-
-      if (errno == EINTR) {
+  running_.store(true);
+  accept_thread_ = std::thread([this]() {
+    while (running_.load()) {
+      int client_fd = accept_client(server_fd_);
+      if (client_fd < 0) {
+        if (errno == EINTR) {
+          continue;
+        }
         continue;
       }
-      continue;
+
+      // Thread-safe push
+      {
+        std::lock_guard<std::mutex> lock(client_fds_mutex_);
+        client_fds_.push_back(client_fd);
+      }
+
+      pool.submit([this, client_fd]() { handle_client(client_fd); });
     }
-
-    // Spawn thread for this client
-    client_threads_.emplace_back(&Server::handle_client, this, client_fd);
-    client_fds.push_back(client_fd);
-
-  } // while running block
+  });
 }
 
 void Server::stop() {
+  // std::cout << "\nShutting down server...\n";
 
-  std::cout << "\n Shutting down server...\n";
+  // 1. Stop accepting new connections
+  running_.store(false);
 
-  // 1. Close all client sockets
-  if (!client_fds.empty()) {
-    std::cout << "   Closing client connections (" << client_fds.size()
-              << ")...\n";
-    for (int fd : client_fds) {
-      socket_utils::close_socket(fd);
-    }
-  }
-
-  // 2. Wait for all threads to finish
-  if (!client_threads_.empty()) {
-    std::cout << "   Waiting for threads (" << client_threads_.size()
-              << ")...\n";
-    for (auto &t : client_threads_) {
-      if (t.joinable()) {
-        t.join();
-      }
-    }
-  }
-
-  client_threads_.clear();
-  client_fds.clear();
-
+  // 2. Interrupt accept() to wake up the thread
   if (server_fd_ >= 0) {
+    shutdown(server_fd_, SHUT_RDWR);
     socket_utils::close_socket(server_fd_);
     server_fd_ = -1;
   }
 
-  std::cout << " Server stopped cleanly\n";
+  // 3. Wait for accept thread to finish
+  if (accept_thread_.joinable()) {
+    accept_thread_.join();
+  }
+
+  // 4. Close all client sockets (thread-safe)
+
+  {
+    std::lock_guard<std::mutex> lock(client_fds_mutex_);
+    if (!client_fds_.empty()) {
+      std::cout << "   Closing client connections (" << client_fds_.size()
+                << ")...\n";
+      for (int fd : client_fds_) {
+        shutdown(fd, SHUT_RDWR);
+        socket_utils::close_socket(fd);
+      }
+      client_fds_.clear();
+    }
+  }
+  pool.shutdown();
+
+  std::cout << "Server stopped cleanly\n";
 }
 
 std::string Server::read_command(int client_fd) {
@@ -142,7 +126,7 @@ std::string Server::read_command(int client_fd) {
 
   if (bytes_received <= 0) {
     if (bytes_received == 0) {
-      std::cout << "Client disconnected\n";
+      std::cout << "Client Disconnected\n";
     } else {
       std::cerr << "ERROR: recv failed\n";
     }
