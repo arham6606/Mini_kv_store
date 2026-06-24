@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <vector>
 
+
 namespace network {
 
 class Server {
@@ -52,14 +53,14 @@ private:
   // Command processing
   std::string process_command(const std::string &cmd);
 
-  kvstore::KVStore &store_;
-  std::string host_;
   int port_;
   int server_fd_;
   bool running_;
+  kvstore::KVStore &store_;
+  std::string host_;
   std::vector<int> client_fds;
-  std::vector<std::thread> client_threads_;
   std::atomic<int> active_clients_{0};
+  std::vector<std::thread> client_threads_;
 };
 
 namespace socket_utils {

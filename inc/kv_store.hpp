@@ -3,7 +3,9 @@
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
+#include <mutex>
 #include <optional>
+#include <shared_mutex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -40,6 +42,7 @@ public:
   [[nodiscard]] std::size_t size() const noexcept;
 
 private:
+  mutable std::mutex mutex_;
   std::unordered_map<std::string, std::string> store_;
 };
 } // namespace kvstore
