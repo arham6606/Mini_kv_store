@@ -32,8 +32,9 @@ int main(int argc, char *argv[]) {
   std::cout << "Starting kvstore server...\n";
   std::cout << "Host: " << host << ", Port: " << port << "\n";
 
-  size_t pool_size = 4;
-  network::Server server(store, host, port, pool_size);
+  size_t pool_size = 2;
+  size_t queue_size = 5;
+  network::Server server(store, host, port, pool_size, queue_size);
 
   // Wait for signals directly in main thread
   server.start();

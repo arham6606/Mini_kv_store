@@ -14,9 +14,9 @@ std::string to_upper(std::string s) {
 } // namespace
 
 Server::Server(kvstore::KVStore &store, const std::string &host, int port,
-               size_t pool_size)
-    : store_(store), host_(host), port_(port), pool(pool_size), server_fd_(-1),
-      running_(false) {}
+               size_t pool_size, size_t max_queue)
+    : store_(store), host_(host), port_(port), pool(pool_size, max_queue),
+      server_fd_(-1), running_(false) {}
 
 Server::~Server() {
   if (running_) {

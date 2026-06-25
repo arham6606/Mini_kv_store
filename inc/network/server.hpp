@@ -24,7 +24,7 @@ namespace network {
 class Server {
 public:
   Server(kvstore::KVStore &store, const std::string &host = "127.0.0.1",
-         int port = 6379, size_t pool_size = 4);
+         int port = 6379, size_t pool_size = 4, size_t queue_size = 100);
 
   ~Server();
 

@@ -2,7 +2,9 @@
 
 namespace network {
 
-ThreadPool::ThreadPool(size_t num_threads) {
+ThreadPool::ThreadPool(size_t num_threads, size_t queue_size)
+    : max_queue(queue_size) {
+
   for (size_t i = 0; i < num_threads; ++i) {
     workers_.emplace_back([this]() {
       while (true) {
@@ -14,6 +16,7 @@ ThreadPool::ThreadPool(size_t num_threads) {
             return;
           task = std::move(tasks_.front());
           tasks_.pop();
+          cv_.notify_all();
         }
         task(); // Execute database work here
       }
@@ -22,10 +25,16 @@ ThreadPool::ThreadPool(size_t num_threads) {
 }
 
 void ThreadPool::submit(std::function<void()> task) {
-  {
-    std::lock_guard<std::mutex> lock(queue_mutex_);
-    tasks_.push(std::move(task));
-  }
+  std::unique_lock<std::mutex> lock(queue_mutex_);
+  // Wait if queue is full (bounded queue)
+  cv_.wait(lock, [this]() { return stop_ || tasks_.size() < max_queue; });
+
+  // Don't accept new tasks during shutdown
+  if (stop_)
+    return;
+
+  tasks_.push(std::move(task));
+  std::cout << tasks_.size() << std::endl;
   cv_.notify_one();
 }
 

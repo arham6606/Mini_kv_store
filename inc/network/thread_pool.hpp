@@ -3,6 +3,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <functional>
+#include <iostream>
 #include <mutex>
 #include <queue>
 #include <sys/socket.h>
@@ -18,9 +19,10 @@ private:
   std::condition_variable cv_;
   std::atomic<bool> stop_{false};
   std::vector<std::thread> workers_;
+  size_t max_queue;
 
 public:
-  ThreadPool(size_t pool_size);
+  ThreadPool(size_t pool_size, size_t queue_size);
 
   void submit(std::function<void()> task);
 
