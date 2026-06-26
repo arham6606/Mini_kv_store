@@ -1,4 +1,7 @@
 #pragma once
+
+#include "inc/database/aof_persistence.hpp"
+
 #include <cctype>
 #include <cstddef>
 #include <cstdlib>
@@ -10,7 +13,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace kvstore {
+namespace DataBase {
 class KVStore {
 public:
   KVStore() {
@@ -41,8 +44,12 @@ public:
 
   [[nodiscard]] std::size_t size() const noexcept;
 
+  // setter for aof persistence
+  void set_write(const std::string &data);
+
 private:
-  mutable std::shared_mutex mutex_;
   std::unordered_map<std::string, std::string> store_;
+  DataBase::AOFPersistence aof_;
+  mutable std::shared_mutex mutex_;
 };
-} // namespace kvstore
+} // namespace DataBase

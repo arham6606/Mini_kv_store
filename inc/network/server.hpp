@@ -1,6 +1,6 @@
 #pragma once
 
-#include "inc/kv_store.hpp"
+#include "inc/database/kv_store.hpp"
 #include "inc/network/thread_pool.hpp"
 
 #include <arpa/inet.h>
@@ -23,7 +23,7 @@
 namespace network {
 class Server {
 public:
-  Server(kvstore::KVStore &store, const std::string &host = "127.0.0.1",
+  Server(DataBase::KVStore &store, const std::string &host = "127.0.0.1",
          int port = 6379, size_t pool_size = 4, size_t queue_size = 100);
 
   ~Server();
@@ -56,7 +56,7 @@ private:
   int port_;
   int server_fd_;
   std::atomic<bool> running_{false};
-  kvstore::KVStore &store_;
+  DataBase::KVStore &store_;
   std::string host_;
   std::vector<int> client_fds_;
   std::mutex client_fds_mutex_;

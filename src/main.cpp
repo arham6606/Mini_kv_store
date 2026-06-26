@@ -1,4 +1,4 @@
-#include "inc/kv_store.hpp"
+#include "inc/database/kv_store.hpp"
 #include "inc/network/server.hpp"
 
 int main(int argc, char *argv[]) {
@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   sigaddset(&mask, SIGTERM);
   pthread_sigmask(SIG_BLOCK, &mask, nullptr);
 
-  kvstore::KVStore store;
+  DataBase::KVStore store;
   std::string host = "127.0.0.1";
   int port = 6379;
 

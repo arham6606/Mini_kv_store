@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include  "inc/kv_store.hpp"
+#include  "inc/database/kv_store.hpp"
 
 namespace {
 
@@ -21,7 +21,7 @@ void check(bool condition, const std::string& description) {
 }  // namespace
 
 int main() {
-    kvstore::KVStore store;
+    DataBase::KVStore store;
 
     check(store.size() == 0, "new store has size 0");
 

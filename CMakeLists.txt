@@ -7,8 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCES
     src/main.cpp
-    src/kv_store.cpp
-    
+    src/database/kv_store.cpp
+    src/database/aof_persistence.cpp
+
     src/network/thread_pool.cpp
     src/network/server.cpp
     src/network/socket_utils.cpp

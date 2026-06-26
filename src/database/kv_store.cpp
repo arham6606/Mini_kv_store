@@ -1,6 +1,6 @@
-#include "inc/kv_store.hpp"
+#include "inc/database/kv_store.hpp"
 
-namespace kvstore {
+namespace DataBase {
 
 void KVStore::set(const std::string &key, const std::string &value) {
   std::lock_guard<std::shared_mutex> lock(mutex_);
@@ -31,4 +31,6 @@ std::size_t KVStore::size() const noexcept {
   return store_.size();
 }
 
-} // namespace kvstore
+void KVStore::set_write(const std::string &data) { aof_.write_data(data); }
+
+} // namespace DataBase

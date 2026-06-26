@@ -4,10 +4,10 @@
 #include <iostream>
 #include <thread>
 #include <vector>
-#include "inc/kv_store.hpp"
+#include "inc/database/kv_store.hpp"
 class ConcurrentStressTest {
 private:
-  kvstore::KVStore store_;
+  DataBase::KVStore store_;
   std::atomic<bool> stop_{false};
   std::atomic<int> success_count_{0};
   std::atomic<int> error_count_{0};

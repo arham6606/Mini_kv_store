@@ -13,7 +13,7 @@ std::string to_upper(std::string s) {
 }
 } // namespace
 
-Server::Server(kvstore::KVStore &store, const std::string &host, int port,
+Server::Server(DataBase::KVStore &store, const std::string &host, int port,
                size_t pool_size, size_t max_queue)
     : store_(store), host_(host), port_(port), pool(pool_size, max_queue),
       server_fd_(-1), running_(false) {}
@@ -184,6 +184,7 @@ std::string Server::process_command(const std::string &cmd_line) {
       return "ERR wrong number of arguments";
     }
     store_.set(key, value);
+    store_.set_write("SET " + key + " " + value + "\n");
     return "OK";
 
   } else if (cmd == "GET") {
