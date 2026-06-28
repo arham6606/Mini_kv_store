@@ -44,14 +44,14 @@ private:
   bool bind_socket(int sockfd);
   bool listen_socket(int sockfd);
   int accept_client(int sockfd);
+  void send_response(int client_fd, const std::string &response);
 
   // Client handling
   void handle_client(int client_fd);
   std::string read_command(int client_fd);
-  void send_response(int client_fd, const std::string &response);
 
   // Command processing
-  std::string process_command(const std::string &cmd);
+  std::string process_command(int client_fd, const std::string &cmd);
 
   int port_;
   int server_fd_;

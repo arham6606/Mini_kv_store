@@ -159,7 +159,8 @@ void Server::send_response(int client_fd, const std::string &response) {
   socket_utils::send_data(client_fd, formatted_response);
 }
 
-std::string Server::process_command(const std::string &cmd_line) {
+std::string Server::process_command(int client_fd,
+                                    const std::string &cmd_line) {
   std::istringstream iss(cmd_line);
   std::string cmd;
   iss >> cmd;
@@ -185,9 +186,11 @@ std::string Server::process_command(const std::string &cmd_line) {
     }
     store_.set(key, value);
     if (!store_.check_file_size()) {
-      store_.set_write("\nSET " + key + " " + value);
+      store_.set_write("SET " + key + " " + value + " " +
+                       store_.entry_fields.expiry_str + "\n");
     } else {
-      store_.set_write("SET " + key + " " + value + "\n");
+      store_.set_write("SET " + key + " " + value + " " +
+                       store_.entry_fields.expiry_str + "\n");
     }
     return "OK";
 
@@ -200,7 +203,7 @@ std::string Server::process_command(const std::string &cmd_line) {
     if (iss >> extra) {
       return "ERR wrong number of arguments";
     }
-    auto result = store_.get(key);
+    auto result = store_.get(client_fd,key);
     if (result.has_value()) {
       return *result;
     }
@@ -250,7 +253,7 @@ void Server::handle_client(int client_fd) {
       continue;
     }
 
-    std::string response = process_command(command);
+    std::string response = process_command(client_fd, command);
 
     if (response == "BYE") {
       send_response(client_fd, "Goodbye!");

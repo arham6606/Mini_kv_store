@@ -3,31 +3,43 @@
 namespace DataBase {
 
 void KVStore::set(const std::string &key, const std::string &value) {
-  std::lock_guard<std::shared_mutex> lock(mutex_);
-  store_[key] = value;
+  std::unique_lock<std::mutex> lock(mutex_);
+  auto expiry_time =
+      std::chrono::steady_clock::now() + std::chrono::seconds(60);
+  entry_fields.expiry_str =
+      std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(
+                         expiry_time.time_since_epoch())
+                         .count());
+  store_[key] = {value, expiry_time};
 }
 
-std::optional<std::string> KVStore::get(const std::string &key) const {
-  std::lock_guard<std::shared_mutex> lock(mutex_);
+std::optional<std::string> KVStore::get(int client_fd, const std::string &key) {
+  std::unique_lock<std::mutex> lock(mutex_);
   auto it = store_.find(key);
   if (it == store_.end()) {
     return std::nullopt;
   }
-  return it->second;
+  if (std::chrono::steady_clock::now() > it->second.expiry) {
+    store_.erase(it);
+    // std::cout << "Key expired" << std::endl;
+    network::socket_utils::send_data(client_fd, "Key expired");
+    return std::nullopt;
+  }
+  return it->second.value;
 }
 
 bool KVStore::del(const std::string &key) {
-  std::lock_guard<std::shared_mutex> lock(mutex_);
+  std::unique_lock<std::mutex> lock(mutex_);
   return store_.erase(key) > 0;
 }
 
 bool KVStore::exists(const std::string &key) const {
-  std::lock_guard<std::shared_mutex> lock(mutex_);
+  std::unique_lock<std::mutex> lock(mutex_);
   return store_.find(key) != store_.end();
 }
 
 std::size_t KVStore::size() const noexcept {
-  std::lock_guard<std::shared_mutex> lock(mutex_);
+  std::unique_lock<std::mutex> lock(mutex_);
   return store_.size();
 }
 
@@ -44,13 +56,19 @@ void KVStore::start_up() {
 
 void KVStore::replay(const std::string &line) {
   std::istringstream iss(line);
-  std::string cmd, key, value;
+  std::string cmd, key, value, expiration;
   iss >> cmd;
   iss >> key;
   if (cmd == "SET") {
 
     iss >> value;
-    store_[key] = value;
+
+    iss >> expiration;
+    long long micro_seconds = std::stoll(expiration);
+    auto expiry = std::chrono::steady_clock::time_point(
+        std::chrono::microseconds(micro_seconds));
+
+    store_[key] = {value, expiry};
   }
 }
 

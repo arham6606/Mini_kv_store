@@ -1,6 +1,13 @@
 #pragma once
 
 #include "inc/database/aof_persistence.hpp"
+// #include "inc/network/server.hpp"
+
+namespace network {
+namespace socket_utils {
+bool send_data(int sockfd, const std::string &data);
+}// namespace socket_utiles
+} // namespace network
 
 #include <cctype>
 #include <cstddef>
@@ -14,6 +21,11 @@
 #include <unordered_map>
 
 namespace DataBase {
+struct Entry {
+  std::string value;
+  std::optional<std::chrono::steady_clock::time_point> expiry;
+  std::string expiry_str;
+};
 class KVStore {
 public:
   KVStore() {
@@ -33,7 +45,8 @@ public:
   // a key that is present with an empty string as its value, and a key that is
   // not present at all.
 
-  [[nodiscard]] std::optional<std::string> get(const std::string &key) const;
+  [[nodiscard]] std::optional<std::string> get(int client_fd,
+                                               const std::string &key);
 
   bool del(const std::string &key);
 
@@ -50,9 +63,11 @@ public:
   void start_up();
   void replay(const std::string &line);
   bool check_file_size();
+  Entry entry_fields;
+
 private:
-  std::unordered_map<std::string, std::string> store_;
+  std::unordered_map<std::string, Entry> store_;
   DataBase::AOFPersistence aof_;
-  mutable std::shared_mutex mutex_;
+  mutable std::mutex mutex_;
 };
 } // namespace DataBase
