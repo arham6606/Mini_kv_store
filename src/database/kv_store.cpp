@@ -33,4 +33,26 @@ std::size_t KVStore::size() const noexcept {
 
 void KVStore::set_write(const std::string &data) { aof_.write_data(data); }
 
+void KVStore::start_up() {
+  auto lines = aof_.read_all_data();
+
+  for (const auto &line : lines) {
+    replay(line);
+  }
+  std::cout << "Data backed up" << std::endl;
+}
+
+void KVStore::replay(const std::string &line) {
+  std::istringstream iss(line);
+  std::string cmd, key, value;
+  iss >> cmd;
+  iss >> key;
+  if (cmd == "SET") {
+
+    iss >> value;
+    store_[key] = value;
+  }
+}
+
+bool KVStore::check_file_size() { return aof_.file_empty(); }
 } // namespace DataBase

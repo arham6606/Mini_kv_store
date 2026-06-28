@@ -10,6 +10,7 @@ int main(int argc, char *argv[]) {
   pthread_sigmask(SIG_BLOCK, &mask, nullptr);
 
   DataBase::KVStore store;
+  store.start_up();
   std::string host = "127.0.0.1";
   int port = 6379;
 

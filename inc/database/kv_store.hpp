@@ -47,6 +47,9 @@ public:
   // setter for aof persistence
   void set_write(const std::string &data);
 
+  void start_up();
+  void replay(const std::string &line);
+  bool check_file_size();
 private:
   std::unordered_map<std::string, std::string> store_;
   DataBase::AOFPersistence aof_;

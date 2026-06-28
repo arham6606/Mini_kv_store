@@ -184,7 +184,11 @@ std::string Server::process_command(const std::string &cmd_line) {
       return "ERR wrong number of arguments";
     }
     store_.set(key, value);
-    store_.set_write("SET " + key + " " + value + "\n");
+    if (!store_.check_file_size()) {
+      store_.set_write("\nSET " + key + " " + value);
+    } else {
+      store_.set_write("SET " + key + " " + value + "\n");
+    }
     return "OK";
 
   } else if (cmd == "GET") {
