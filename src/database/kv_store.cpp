@@ -19,12 +19,12 @@ std::optional<std::string> KVStore::get(int client_fd, const std::string &key) {
   if (it == store_.end()) {
     return std::nullopt;
   }
-  if (std::chrono::steady_clock::now() > it->second.expiry) {
-    store_.erase(it);
-    // std::cout << "Key expired" << std::endl;
-    network::socket_utils::send_data(client_fd, "Key expired");
-    return std::nullopt;
-  }
+   if (std::chrono::steady_clock::now() > it->second.expiry) {
+   store_.erase(it);
+   std::cout << "Key expired" << std::endl;
+   network::socket_utils::send_data(client_fd, "Key expired");
+   return std::nullopt;
+   }
   return it->second.value;
 }
 
@@ -73,4 +73,32 @@ void KVStore::replay(const std::string &line) {
 }
 
 bool KVStore::check_file_size() { return aof_.file_empty(); }
+
+KVStore::~KVStore() {
+  stop_ = true;
+  cv.notify_one();
+  scanner_thread.join();
+}
+
+void KVStore::remove_expired() {
+  auto now = std::chrono::steady_clock::now();
+  std::unique_lock<std::mutex> lock(mutex_);
+
+  for (auto it = store_.begin(); it != store_.end();) {
+    if (it->second.expiry <= now)
+      it = store_.erase(it); // erase returns next iterator
+    else
+      ++it;
+  }
+}
+
+void KVStore::scanner_loop() {
+  while (!stop_) {
+    remove_expired();
+    std::unique_lock<std::mutex> lock(cv_mutex);
+    cv.wait_for(lock, std::chrono::seconds(5), [this] { return stop_.load(); });
+  }
+
+}
+
 } // namespace DataBase

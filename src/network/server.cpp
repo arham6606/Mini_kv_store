@@ -58,6 +58,8 @@ void Server::start() {
   std::cout << "Server listening on " << host_ << ":" << port_ << "\n";
   std::cout << "Press Ctrl+C to shutdown gracefully\n\n";
 
+    
+
   running_.store(true);
   accept_thread_ = std::thread([this]() {
     while (running_.load()) {

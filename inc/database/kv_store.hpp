@@ -6,10 +6,13 @@
 namespace network {
 namespace socket_utils {
 bool send_data(int sockfd, const std::string &data);
-}// namespace socket_utiles
+} // namespace socket_utils
 } // namespace network
 
+#include <atomic>
 #include <cctype>
+#include <chrono>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -18,6 +21,7 @@ bool send_data(int sockfd, const std::string &data);
 #include <shared_mutex>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <unordered_map>
 
 namespace DataBase {
@@ -28,10 +32,15 @@ struct Entry {
 };
 class KVStore {
 public:
+  Entry entry_fields;
+
   KVStore() {
     store_.reserve(10000);
     store_.max_load_factor(0.3);
+    scanner_thread = std::thread([this] { scanner_loop(); });
   }
+
+  ~KVStore();
 
   void set(const std::string &key, const std::string &value);
 
@@ -63,11 +72,16 @@ public:
   void start_up();
   void replay(const std::string &line);
   bool check_file_size();
-  Entry entry_fields;
+  void remove_expired();
+  void scanner_loop();
 
 private:
   std::unordered_map<std::string, Entry> store_;
   DataBase::AOFPersistence aof_;
   mutable std::mutex mutex_;
+  std::mutex cv_mutex;
+  std::condition_variable cv;
+  std::atomic<bool> stop_{false};
+  std::thread scanner_thread;
 };
 } // namespace DataBase
