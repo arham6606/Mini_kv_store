@@ -49,7 +49,7 @@ private:
   // Client handling
   void handle_client(int client_fd);
   std::string read_command(int client_fd);
-
+  std::string parse_quoted(std::istringstream&iss);
   // Command processing
   std::string process_command(int client_fd, const std::string &cmd);
 

@@ -58,8 +58,6 @@ void Server::start() {
   std::cout << "Server listening on " << host_ << ":" << port_ << "\n";
   std::cout << "Press Ctrl+C to shutdown gracefully\n\n";
 
-    
-
   running_.store(true);
   accept_thread_ = std::thread([this]() {
     while (running_.load()) {
@@ -160,6 +158,46 @@ void Server::send_response(int client_fd, const std::string &response) {
   std::string formatted_response = response + "\n";
   socket_utils::send_data(client_fd, formatted_response);
 }
+std::string Server::parse_quoted(std::istringstream &iss) {
+  std::string token;
+  if (!(iss >> token)) {
+    return "";
+  }
+
+  // Case 1: Starts with quote
+  if (token.front() == '"' || token.front() == '\'') {
+    char quote = token.front();
+
+    // Single token with matching quotes: "arham" or 'arham'
+    if (token.length() > 1 && token.back() == quote) {
+      return token.substr(1, token.length() - 2);
+    }
+
+    // Multi-word quoted string
+    std::string full = token;
+    while (token.back() != quote) {
+      if (!(iss >> token)) {
+        return ""; // Unclosed opening quote → ERROR
+      }
+      full += " " + token;
+    }
+    return full.substr(1, full.length() - 2);
+  }
+
+  // Case 2: Doesn't start with quote
+  // Check if ANY remaining token has a stray closing quote
+  std::string full = token;
+  std::string next;
+
+  while (iss >> next) {
+    if (next.back() == '"' || next.back() == '\'') {
+      return ""; // Stray closing quote → ERROR
+    }
+    full += " " + next;
+  }
+
+  return full;
+}
 
 std::string Server::process_command(int client_fd,
                                     const std::string &cmd_line) {
@@ -178,14 +216,15 @@ std::string Server::process_command(int client_fd,
 
   } else if (cmd == "SET") {
     std::string key, value;
-    if (!(iss >> key >> value)) {
+    if (!(iss >> key)) {
       return "ERR wrong number of arguments";
     }
-    // Check for extra tokens
-    std::string extra;
-    if (iss >> extra) {
+
+    value = parse_quoted(iss);
+    if (value.empty()) {
       return "ERR wrong number of arguments";
     }
+
     store_.set(key, value);
     if (!store_.check_file_size()) {
       store_.set_write("SET " + key + " " + value + " " +
@@ -205,7 +244,7 @@ std::string Server::process_command(int client_fd,
     if (iss >> extra) {
       return "ERR wrong number of arguments";
     }
-    auto result = store_.get(client_fd,key);
+    auto result = store_.get(client_fd, key);
     if (result.has_value()) {
       return *result;
     }
