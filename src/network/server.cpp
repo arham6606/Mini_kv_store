@@ -195,6 +195,9 @@ std::string Server::parse_quoted(std::istringstream &iss) {
     }
     full += " " + next;
   }
+  if (full.back() == '"') {
+    full.pop_back();
+  }
 
   return full;
 }

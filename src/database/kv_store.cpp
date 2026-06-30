@@ -19,12 +19,12 @@ std::optional<std::string> KVStore::get(int client_fd, const std::string &key) {
   if (it == store_.end()) {
     return std::nullopt;
   }
-   if (std::chrono::steady_clock::now() > it->second.expiry) {
-   store_.erase(it);
-   std::cout << "Key expired" << std::endl;
-   network::socket_utils::send_data(client_fd, "Key expired");
-   return std::nullopt;
-   }
+  if (std::chrono::steady_clock::now() > it->second.expiry) {
+    store_.erase(it);
+    std::cout << "Key expired" << std::endl;
+    network::socket_utils::send_data(client_fd, "Key expired");
+    return std::nullopt;
+  }
   return it->second.value;
 }
 
@@ -57,18 +57,51 @@ void KVStore::start_up() {
 void KVStore::replay(const std::string &line) {
   std::istringstream iss(line);
   std::string cmd, key, value, expiration;
+
+  // Parse command
   iss >> cmd;
+  if (cmd != "SET") {
+    return; // Handle other commands if needed
+  }
+
+  // Parse key
   iss >> key;
-  if (cmd == "SET") {
 
-    iss >> value;
+  // Parse everything after key until the last token (expiration)
+  std::vector<std::string> parts;
+  std::string token;
+  while (iss >> token) {
+    parts.push_back(token);
+  }
 
-    iss >> expiration;
+  // Last token is always the expiration (timestamp)
+  if (parts.empty()) {
+    // Invalid SET command - missing value and expiration
+    return;
+  }
+
+  // Extract expiration (last element)
+  expiration = parts.back();
+  parts.pop_back(); // Remove expiration from parts
+
+  // Reconstruct value (join remaining parts with spaces)
+  value = "";
+  for (size_t i = 0; i < parts.size(); ++i) {
+    if (i > 0)
+      value += " ";
+    value += parts[i];
+  }
+
+  // Parse expiration
+  try {
     long long micro_seconds = std::stoll(expiration);
     auto expiry = std::chrono::steady_clock::time_point(
         std::chrono::microseconds(micro_seconds));
 
     store_[key] = {value, expiry};
+  } catch (const std::exception &e) {
+    // Handle invalid expiration
+    std::cerr << "Invalid expiration: " << expiration << std::endl;
   }
 }
 
@@ -98,7 +131,6 @@ void KVStore::scanner_loop() {
     std::unique_lock<std::mutex> lock(cv_mutex);
     cv.wait_for(lock, std::chrono::seconds(5), [this] { return stop_.load(); });
   }
-
 }
 
 } // namespace DataBase
