@@ -5,7 +5,7 @@ namespace DataBase {
 void KVStore::set(const std::string &key, const std::string &value) {
   std::unique_lock<std::mutex> lock(mutex_);
   auto expiry_time =
-      std::chrono::steady_clock::now() + std::chrono::seconds(60);
+      std::chrono::steady_clock::now() + std::chrono::seconds(600);
   entry_fields.expiry_str =
       std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(
                          expiry_time.time_since_epoch())
